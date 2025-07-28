@@ -5,13 +5,13 @@ import {
   getYearlyReport,
   getDepartmentReport,
 } from "../controllers/ReportController.js";
-import { authenticateToken, requirePicCatering } from "../middleware/auth.js";
+import { authenticateToken, requirePic } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // All routes require authentication and PIC Catering role
 router.use(authenticateToken);
-router.use(requirePicCatering);
+router.use(requirePic);
 
 router.get("/daily", getDailyReport);
 router.get("/monthly", getMonthlyReport);

@@ -24,10 +24,28 @@ const User = database.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    pin: {
+      type: DataTypes.STRING(6),
+      allowNull: true,
+      unique: true,
+      validate: {
+        isNumeric: true,
+        len: [6, 6],
+      },
+      comment: "6-digit PIN for quick login",
+    },
     role: {
       type: DataTypes.ENUM("administrator", "pic_catering"),
       allowNull: false,
       defaultValue: "pic_catering",
+    },
+    departmentId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "departments",
+        key: "id",
+      },
     },
     isActive: {
       type: DataTypes.BOOLEAN,

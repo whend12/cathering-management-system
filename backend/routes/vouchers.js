@@ -9,7 +9,7 @@ import {
   getDepartmentVouchers,
   expireOldVouchers,
 } from "../controllers/VoucherController.js";
-import { authenticateToken, requirePicCatering } from "../middleware/auth.js";
+import { authenticateToken, requirePic } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -21,11 +21,11 @@ router.get("/code/:code", getVoucherByCode);
 router.post("/use/:code", useVoucher);
 
 // PIC Catering routes
-router.post("/generate", requirePicCatering, generateVouchersForWeek);
-router.get("/", requirePicCatering, getAllVouchers);
-router.get("/:id", requirePicCatering, getVoucherById);
-router.put("/:id/status", requirePicCatering, updateVoucherStatus);
+router.post("/generate", requirePic, generateVouchersForWeek);
+router.get("/", requirePic, getAllVouchers);
+router.get("/:id", requirePic, getVoucherById);
+router.put("/:id/status", requirePic, updateVoucherStatus);
 router.get("/department/:departmentId", getDepartmentVouchers);
-router.post("/expire-old", requirePicCatering, expireOldVouchers);
+router.post("/expire-old", requirePic, expireOldVouchers);
 
 export default router;

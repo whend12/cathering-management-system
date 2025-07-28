@@ -7,7 +7,7 @@ import {
   requestOrderEdit,
   approveOrderEdit,
 } from "../controllers/OrderController.js";
-import { authenticateToken, requirePicCatering } from "../middleware/auth.js";
+import { authenticateToken, requirePic } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.post("/", createOrder);
 router.post("/:id/edit-request", requestOrderEdit);
 
 // PIC Catering only
-router.put("/:id/status", requirePicCatering, updateOrderStatus);
-router.put("/:id/approve-edit", requirePicCatering, approveOrderEdit);
+router.put("/:id/status", requirePic, updateOrderStatus);
+router.put("/:id/approve-edit", requirePic, approveOrderEdit);
 
 export default router;

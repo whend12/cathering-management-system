@@ -19,6 +19,14 @@ const Order = database.define(
         key: "id",
       },
     },
+    createdBy: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
@@ -33,7 +41,12 @@ const Order = database.define(
       allowNull: false,
       defaultValue: "pending",
     },
-
+    employeeCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      comment: "Number of employees eating from this department",
+    },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,

@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import app from "./index.js";
 import database from "./config/database.js";
 // Import models to ensure associations are loaded
@@ -11,7 +15,7 @@ const startServer = async () => {
     console.log("Database connection established successfully.");
 
     // Sync database (create tables)
-    await database.sync({ alter: true });
+    // await database.sync({ alter: true });
     console.log("Database synchronized successfully.");
 
     app.listen(PORT, () => {

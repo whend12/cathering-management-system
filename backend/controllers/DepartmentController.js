@@ -1,5 +1,10 @@
-import { Department, Order } from "../models/index.js";
+import { Department, Order, Employee } from "../models/index.js";
 import { Op } from "sequelize";
+
+// Helper function to generate random 6-digit PIN
+const generatePin = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 export const getAllDepartments = async (req, res) => {
   try {
@@ -221,6 +226,124 @@ export const verifyPin = async (req, res) => {
     });
   } catch (error) {
     console.error("Verify PIN error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getDepartmentUsers = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const department = await Department.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: "users",
+          attributes: { exclude: ["password"] },
+          order: [["name", "ASC"]],
+        },
+      ],
+    });
+
+    if (!department) {
+      return res.status(404).json({
+        success: false,
+        message: "Departemen tidak ditemukan",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: department.users,
+    });
+  } catch (error) {
+    console.error("Get department users error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil data user departemen",
+    });
+  }
+};
+
+export const getDepartmentEmployees = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const department = await Department.findByPk(id, {
+      include: [
+        {
+          model: Employee,
+          as: "employees",
+          where: { isActive: true },
+          required: false,
+          order: [["name", "ASC"]],
+        },
+      ],
+    });
+
+    if (!department) {
+      return res.status(404).json({
+        success: false,
+        message: "Department not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: department.employees || [],
+    });
+  } catch (error) {
+    console.error("Get department employees error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const generateDepartmentPin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const department = await Department.findByPk(id);
+    if (!department) {
+      return res.status(404).json({
+        success: false,
+        message: "Department not found",
+      });
+    }
+
+    let newPin;
+    let isUnique = false;
+
+    // Generate unique PIN
+    while (!isUnique) {
+      newPin = generatePin();
+      const existingPin = await Department.findOne({
+        where: { pin: newPin, id: { [Op.ne]: id } },
+      });
+
+      if (!existingPin) {
+        isUnique = true;
+      }
+    }
+
+    await department.update({ pin: newPin });
+
+    res.json({
+      success: true,
+      message: "Department PIN generated successfully",
+      data: {
+        id: department.id,
+        name: department.name,
+        pin: newPin,
+      },
+    });
+  } catch (error) {
+    console.error("Generate PIN error:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

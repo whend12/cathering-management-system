@@ -4,7 +4,9 @@ import cors from "cors";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/users.js";
 import departmentRoutes from "./routes/departments.js";
+import employeeRoutes from "./routes/employees.js";
 import foodRoutes from "./routes/foods.js";
 import orderRoutes from "./routes/orders.js";
 import feedbackRoutes from "./routes/feedbacks.js";
@@ -23,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/departments", departmentRoutes);
+app.use("/api/employees", employeeRoutes);
 app.use("/api/foods", foodRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/feedbacks", feedbackRoutes);

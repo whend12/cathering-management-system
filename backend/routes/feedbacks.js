@@ -7,7 +7,7 @@ import {
   deleteFeedback,
   getFeedbackStats,
 } from "../controllers/FeedbackController.js";
-import { authenticateToken, requirePicCatering } from "../middleware/auth.js";
+import { authenticateToken, requirePic } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.get("/:id", getFeedbackById);
 router.post("/", createFeedback);
 
 // PIC Catering can manage all feedbacks
-router.put("/:id", requirePicCatering, updateFeedback);
-router.delete("/:id", requirePicCatering, deleteFeedback);
+router.put("/:id", requirePic, updateFeedback);
+router.delete("/:id", requirePic, deleteFeedback);
 
 export default router;

@@ -6,13 +6,13 @@ import {
   deleteWeeklySchedule,
   getDepartmentSchedule,
 } from "../controllers/ScheduleController.js";
-import { authenticateToken, requirePicCatering } from "../middleware/auth.js";
+import { authenticateToken, requirePic } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // All routes require authentication and PIC Catering role
 router.use(authenticateToken);
-router.use(requirePicCatering);
+router.use(requirePic);
 
 router.post("/generate", generateWeeklySchedule);
 router.get("/", getWeeklySchedule);

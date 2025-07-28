@@ -7,7 +7,7 @@ import {
   deleteFood,
   getFoodCategories,
 } from "../controllers/FoodController.js";
-import { authenticateToken, requirePicCatering } from "../middleware/auth.js";
+import { authenticateToken, requirePic } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -20,8 +20,8 @@ router.get("/categories", getFoodCategories);
 router.get("/:id", getFoodById);
 
 // PIC Catering only
-router.post("/", requirePicCatering, createFood);
-router.put("/:id", requirePicCatering, updateFood);
-router.delete("/:id", requirePicCatering, deleteFood);
+router.post("/", requirePic, createFood);
+router.put("/:id", requirePic, updateFood);
+router.delete("/:id", requirePic, deleteFood);
 
 export default router;

@@ -2,18 +2,92 @@ import bcrypt from "bcrypt";
 import {
   User,
   Department,
+  Employee,
   Food,
   WeeklySchedule,
   Voucher,
 } from "../models/index.js";
 
+// Helper function to generate random 6-digit PIN
+const generatePin = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
 const seedDatabase = async () => {
   try {
     console.log("Starting database seeding...");
 
-    // Create default users
     const hashedPassword = await bcrypt.hash("password123", 10);
 
+    // Create departments first
+    const departments = [
+      {
+        name: "IT Department",
+        description: "Information Technology Department",
+        picName: "John Doe",
+        canOrder: true,
+        orderSequence: 1,
+      },
+      {
+        name: "Finance Department",
+        description: "Finance and Accounting Department",
+        picName: "Jane Smith",
+        canOrder: true,
+        orderSequence: 2,
+      },
+      {
+        name: "HR Department",
+        description: "Human Resources Department",
+        picName: "Mike Johnson",
+        canOrder: true,
+        orderSequence: 3,
+      },
+      {
+        name: "Marketing Department",
+        description: "Marketing and Sales Department",
+        picName: "Sarah Wilson",
+        canOrder: true,
+        orderSequence: 4,
+      },
+      {
+        name: "Operations Department",
+        description: "Operations and Production Department",
+        picName: "David Brown",
+        canOrder: true,
+        orderSequence: 5,
+      },
+    ];
+
+    const createdDepartments = [];
+    for (const dept of departments) {
+      // Generate unique PIN for each department
+      let pin;
+      let isUnique = false;
+
+      while (!isUnique) {
+        pin = generatePin();
+        const existingPin = await Department.findOne({ where: { pin } });
+        if (!existingPin) {
+          isUnique = true;
+        }
+      }
+
+      const [department, created] = await Department.findOrCreate({
+        where: { name: dept.name },
+        defaults: { ...dept, pin },
+      });
+
+      // Update PIN if department already exists but doesn't have one
+      if (!created && !department.pin) {
+        await department.update({ pin });
+      }
+
+      createdDepartments.push(department);
+    }
+
+    console.log("✓ Departments created");
+
+    // Create default users - only Administrator and PIC Catering
     const admin = await User.findOrCreate({
       where: { email: "admin@catering.com" },
       defaults: {
@@ -36,23 +110,137 @@ const seedDatabase = async () => {
 
     console.log("✓ Default users created");
 
-    // Create departments
-    const departments = [
-      { name: "IT Department", pin: "123456", orderSequence: 1 },
-      { name: "Finance Department", pin: "234567", orderSequence: 2 },
-      { name: "HR Department", pin: "345678", orderSequence: 3 },
-      { name: "Marketing Department", pin: "456789", orderSequence: 4 },
-      { name: "Operations Department", pin: "567890", orderSequence: 5 },
+    // Create sample employees for each department
+    const sampleEmployees = [
+      // IT Department employees
+      {
+        employeeId: "EMP001",
+        name: "John Doe",
+        email: "john.doe@company.com",
+        phone: "08123456001",
+        departmentId: createdDepartments[0].id,
+        position: "Software Developer",
+        joinDate: new Date("2023-01-15"),
+        createdBy: picCatering[0].id,
+      },
+      {
+        employeeId: "EMP002",
+        name: "Alice Cooper",
+        email: "alice.cooper@company.com",
+        phone: "08123456002",
+        departmentId: createdDepartments[0].id,
+        position: "System Administrator",
+        joinDate: new Date("2023-02-01"),
+        createdBy: picCatering[0].id,
+      },
+      {
+        employeeId: "EMP003",
+        name: "Bob Wilson",
+        email: "bob.wilson@company.com",
+        phone: "08123456003",
+        departmentId: createdDepartments[0].id,
+        position: "Database Administrator",
+        joinDate: new Date("2023-03-10"),
+        createdBy: picCatering[0].id,
+      },
+
+      // Finance Department employees
+      {
+        employeeId: "EMP004",
+        name: "Jane Smith",
+        email: "jane.smith@company.com",
+        phone: "08123456004",
+        departmentId: createdDepartments[1].id,
+        position: "Financial Analyst",
+        joinDate: new Date("2023-01-20"),
+        createdBy: picCatering[0].id,
+      },
+      {
+        employeeId: "EMP005",
+        name: "Charlie Brown",
+        email: "charlie.brown@company.com",
+        phone: "08123456005",
+        departmentId: createdDepartments[1].id,
+        position: "Accountant",
+        joinDate: new Date("2023-02-15"),
+        createdBy: picCatering[0].id,
+      },
+
+      // HR Department employees
+      {
+        employeeId: "EMP006",
+        name: "Mike Johnson",
+        email: "mike.johnson@company.com",
+        phone: "08123456006",
+        departmentId: createdDepartments[2].id,
+        position: "HR Manager",
+        joinDate: new Date("2023-01-10"),
+        createdBy: picCatering[0].id,
+      },
+      {
+        employeeId: "EMP007",
+        name: "Diana Prince",
+        email: "diana.prince@company.com",
+        phone: "08123456007",
+        departmentId: createdDepartments[2].id,
+        position: "Recruitment Specialist",
+        joinDate: new Date("2023-03-01"),
+        createdBy: picCatering[0].id,
+      },
+
+      // Marketing Department employees
+      {
+        employeeId: "EMP008",
+        name: "Sarah Wilson",
+        email: "sarah.wilson@company.com",
+        phone: "08123456008",
+        departmentId: createdDepartments[3].id,
+        position: "Marketing Manager",
+        joinDate: new Date("2023-01-25"),
+        createdBy: picCatering[0].id,
+      },
+      {
+        employeeId: "EMP009",
+        name: "Elvis Presley",
+        email: "elvis.presley@company.com",
+        phone: "08123456009",
+        departmentId: createdDepartments[3].id,
+        position: "Digital Marketing Specialist",
+        joinDate: new Date("2023-02-20"),
+        createdBy: picCatering[0].id,
+      },
+
+      // Operations Department employees
+      {
+        employeeId: "EMP010",
+        name: "David Brown",
+        email: "david.brown@company.com",
+        phone: "08123456010",
+        departmentId: createdDepartments[4].id,
+        position: "Operations Manager",
+        joinDate: new Date("2023-01-05"),
+        createdBy: picCatering[0].id,
+      },
+      {
+        employeeId: "EMP011",
+        name: "Frank Sinatra",
+        email: "frank.sinatra@company.com",
+        phone: "08123456011",
+        departmentId: createdDepartments[4].id,
+        position: "Production Supervisor",
+        joinDate: new Date("2023-03-15"),
+        createdBy: picCatering[0].id,
+      },
     ];
 
-    for (const dept of departments) {
-      await Department.findOrCreate({
-        where: { name: dept.name },
-        defaults: dept,
+    for (const empData of sampleEmployees) {
+      await Employee.findOrCreate({
+        where: { employeeId: empData.employeeId },
+        defaults: empData,
       });
     }
 
-    console.log("✓ Departments created");
+    console.log("✓ Sample employees created");
 
     // Create sample foods
     const userId = picCatering[0].id;
@@ -238,12 +426,12 @@ const seedDatabase = async () => {
       "thursday",
     ];
 
-    const createdDepartments = await Department.findAll({
+    const allDepartments = await Department.findAll({
       order: [["orderSequence", "ASC"]],
     });
 
-    for (let i = 0; i < createdDepartments.length; i++) {
-      const dept = createdDepartments[i];
+    for (let i = 0; i < allDepartments.length; i++) {
+      const dept = allDepartments[i];
       const voucherDay = voucherDays[i % voucherDays.length];
 
       await WeeklySchedule.findOrCreate({
@@ -322,9 +510,16 @@ const seedDatabase = async () => {
     console.log("Password: password123");
 
     console.log("\n=== DEPARTMENT PINS ===");
-    departments.forEach((dept) => {
+    for (const dept of createdDepartments) {
       console.log(`${dept.name}: ${dept.pin}`);
-    });
+    }
+
+    console.log("\n=== FLOW INFORMATION ===");
+    console.log("1. Only Administrator & PIC Catering need to login");
+    console.log("2. Department food ordering is done using PIN");
+    console.log("3. Each department has employees managed by PIC Catering");
+    console.log("4. Orders include employee count for each department");
+    console.log("5. PIN-based ordering for department representatives");
   } catch (error) {
     console.error("Error seeding database:", error);
   }
